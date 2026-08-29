@@ -3,47 +3,78 @@ title Fortnite 1440p Launcher
 setlocal enabledelayedexpansion
 
 :: ── CONFIG ──────────────────────────────────────────────────────────
-set "GITHUB_BASE=https://raw.githubusercontent.com/orbitthegreatest/Fortnite-Launchers/master/icons"
+set "GITHUB_BASE=https://raw.githubusercontent.com/orbitthegreatest/Fortnite-Launchers/master"
 set "ICON_NAME=1440p.ico"
 set "ASSET_DIR=%localappdata%\FortniteLaunchersAssets"
 set "ICON_PATH=%ASSET_DIR%\%ICON_NAME%"
-set "RESOLUTION=2000x1440"
-set "SHORTCUT=C:\Users\tutot\Desktop\Orbit settings\Orbit settings\Windows tweaks\fortnite GameUserSettings\1440p.lnk"
+set "RES_W=2000"
+set "RES_H=1440"
+set "DATA_DIR=C:\Users\tutot\Desktop\Orbit settings\Orbit settings\Data (DO NOT TOUCH THIS)\Fortnite GameUserSettings\1440p"
+set "SETTINGS_SRC=%DATA_DIR%\GameUserSettings.ini"
+set "SETTINGS_DEST=%localappdata%\FortniteGame\Saved\Config\WindowsClient\GameUserSettings.ini"
+set "SCRIPT_DIR=%~dp0"
 :: ─────────────────────────────────────────────────────────────────────
 
-:: Resolve icon: local folder first, then download from GitHub
-set "LOCAL_ICONS=%~dp0..\icons"
+:: ── DOWNLOAD ASSETS ON FIRST LAUNCH ─────────────────────────────────
+if not exist "%ASSET_DIR%" mkdir "%ASSET_DIR%"
+
 if not exist "%ICON_PATH%" (
-    if exist "%LOCAL_ICONS%\%ICON_NAME%" (
-        if not exist "%ASSET_DIR%" mkdir "%ASSET_DIR%"
-        copy "%LOCAL_ICONS%\%ICON_NAME%" "%ICON_PATH%" >nul 2>&1
+    set "LOCAL_ICONS=%SCRIPT_DIR%..\icons"
+    if exist "!LOCAL_ICONS!\%ICON_NAME%" (
+        copy "!LOCAL_ICONS!\%ICON_NAME%" "%ICON_PATH%" >nul 2>&1
     ) else (
-        if not exist "%ASSET_DIR%" mkdir "%ASSET_DIR%"
         echo Downloading %ICON_NAME% from GitHub...
-        powershell -NoProfile -Command ^
-            "[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; Invoke-WebRequest -Uri '%GITHUB_BASE%/%ICON_NAME%' -OutFile '%ICON_PATH%' -UseBasicParsing"
-        if not exist "%ICON_PATH%" (
-            echo WARNING: Could not download icon. Continuing without custom icon.
-        )
+        powershell -NoProfile -Command "[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; Invoke-WebRequest -Uri '%GITHUB_BASE%/icons/%ICON_NAME%' -OutFile '%ICON_PATH%' -UseBasicParsing"
     )
 )
 
-:: Set display resolution
-echo Setting resolution to %RESOLUTION%...
-where qres >nul 2>&1
-if %errorlevel%==0 (
-    qres x=%RESOLUTION:x= y=%
-) else (
-    powershell -NoProfile -Command ^
-        "Add-Type -TypeDefinition 'using System; using System.Runtime.InteropServices; public class Display { [DllImport(\"user32.dll\")] public static extern int EnumDisplaySettingsW(string dev, int mode, ref DEVMODE dm); [DllImport(\"user32.dll\")] public static extern int ChangeDisplaySettingsExW(string dev, ref DEVMODE dm, IntPtr hw, uint fl, IntPtr lp); [StructLayout(LayoutKind.Sequential, CharSet=CharSet.Unicode)] public struct DEVMODE { [MarshalAs(UnmanagedType.ByValTStr, SizeConst=32)] public string dmDeviceName; public short dmSpecVersion; public short dmDriverVersion; public short dmSize; public short dmDriverExtra; public int dmFields; public int dmPositionX; public int dmPositionY; public int dmDisplayOrientation; public int dmDisplayFixedOutput; public short dmColor; public short dmDuplex; public short dmYResolution; public short dmTTOption; public short dmCollate; [MarshalAs(UnmanagedType.ByValTStr, SizeConst=32)] public string dmFormName; public short dmLogPixels; public int dmBitsPerPel; public int dmPelsWidth; public int dmPelsHeight; public int dmDisplayFlags; public int dmDisplayFrequency; } }'; $dm = New-Object Display+DEVMODE; $dm.dmSize = [System.Runtime.InteropServices.Marshal]::SizeOf($dm); $dm.dmPelsWidth = 2000; $dm.dmPelsHeight = 1440; $dm.dmFields = 0x00000001 -bor 0x00000002; [Display]::ChangeDisplaySettingsExW($null, [ref]$dm, [IntPtr]::Zero, 0, [IntPtr]::Zero)"
+if not exist "%ASSET_DIR%\SetResolution.exe" (
+    set "LOCAL_EXE=%SCRIPT_DIR%..\SetResolution.exe"
+    if exist "!LOCAL_EXE!" (
+        copy "!LOCAL_EXE!" "%ASSET_DIR%\SetResolution.exe" >nul 2>&1
+    ) else (
+        echo Downloading SetResolution.exe from GitHub...
+        powershell -NoProfile -Command "[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; Invoke-WebRequest -Uri '%GITHUB_BASE%/SetResolution.exe' -OutFile '%ASSET_DIR%\SetResolution.exe' -UseBasicParsing"
+    )
 )
+:: ─────────────────────────────────────────────────────────────────────
 
-:: Run GameUserSettings shortcut
-echo Applying 1440p GameUserSettings...
-start "" "%SHORTCUT%"
-timeout /t 2 /nobreak >nul
+:: ── CHANGE DESKTOP RESOLUTION ───────────────────────────────────────
+echo Setting desktop resolution to %RES_W%x%RES_H%...
+if exist "%ASSET_DIR%\SetResolution.exe" (
+    "%ASSET_DIR%\SetResolution.exe" %RES_W% %RES_H%
+) else if exist "%SCRIPT_DIR%..\SetResolution.exe" (
+    "%SCRIPT_DIR%..\SetResolution.exe" %RES_W% %RES_H%
+) else (
+    echo [ERROR] SetResolution.exe not found. Cannot change resolution.
+)
+:: ─────────────────────────────────────────────────────────────────────
 
-:: Launch Fortnite at high priority
+:: ── APPLY GAMEUSERSETTINGS ──────────────────────────────────────────
+echo Applying GameUserSettings.ini...
+if not exist "%SETTINGS_SRC%" (
+    echo [ERROR] GameUserSettings.ini not found in: %DATA_DIR%
+    pause
+    exit /b 1
+)
+if not exist "%localappdata%\FortniteGame\Saved\Config\WindowsClient\" (
+    echo [ERROR] Fortnite config folder not found. Launch Fortnite at least once first.
+    pause
+    exit /b 1
+)
+if exist "%SETTINGS_DEST%" attrib -r "%SETTINGS_DEST%" >nul 2>&1
+copy /y "%SETTINGS_SRC%" "%SETTINGS_DEST%" >nul
+if %errorlevel% equ 0 (
+    attrib +r "%SETTINGS_DEST%" >nul 2>&1
+    echo [SUCCESS] GameUserSettings.ini applied and set to read-only.
+) else (
+    echo [ERROR] Failed to copy GameUserSettings.ini. Close Fortnite/Epic Launcher and try again.
+    pause
+    exit /b 1
+)
+:: ─────────────────────────────────────────────────────────────────────
+
+:: ── LAUNCH FORTNITE ─────────────────────────────────────────────────
 echo Launching Fortnite (High Priority)...
 start "" /high "com.epicgames.launcher://apps/Fortnite?action=launch&silent=true"
 
