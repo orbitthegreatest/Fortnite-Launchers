@@ -2,7 +2,8 @@
 title Fortnite 1440p Launcher
 setlocal enabledelayedexpansion
 
-set "REPO_DIR=C:\Users\tutot\Desktop\Orbit settings\Orbit settings\Custom launchers\Fortnite-Launchers"
+set "MY_DIR=%~dp0"
+set "REPO_DIR=%MY_DIR%..\..\..\..\..\Custom launchers\Fortnite-Launchers"
 set "ASSET_DIR=%localappdata%\FortniteLaunchersAssets"
 set "RES_EXE=%ASSET_DIR%\SetResolution.exe"
 set "GITHUB_BASE=https://raw.githubusercontent.com/orbitthegreatest/Fortnite-Launchers/master"
