@@ -41,10 +41,14 @@ if not exist "%ASSET_DIR%\SetResolution.exe" (
 
 :: ── CHANGE DESKTOP RESOLUTION ───────────────────────────────────────
 echo Setting desktop resolution to %RES_W%x%RES_H%...
-if exist "%ASSET_DIR%\SetResolution.exe" (
-    "%ASSET_DIR%\SetResolution.exe" %RES_W% %RES_H%
-) else if exist "%SCRIPT_DIR%..\SetResolution.exe" (
-    "%SCRIPT_DIR%..\SetResolution.exe" %RES_W% %RES_H%
+set "RES_EXE="
+if exist "%ASSET_DIR%\SetResolution.exe" set "RES_EXE=%ASSET_DIR%\SetResolution.exe"
+if not defined RES_EXE if exist "%SCRIPT_DIR%..\SetResolution.exe" set "RES_EXE=%SCRIPT_DIR%..\SetResolution.exe"
+
+if defined RES_EXE (
+    start /wait "" "!RES_EXE!" %RES_W% %RES_H%
+    echo Waiting for display to stabilize...
+    timeout /t 2 /nobreak >nul
 ) else (
     echo [ERROR] SetResolution.exe not found. Cannot change resolution.
 )
