@@ -8,11 +8,12 @@ set "RES_EXE=%ASSET_DIR%\SetResolution.exe"
 set "GITHUB_BASE=https://raw.githubusercontent.com/orbitthegreatest/Fortnite-Launchers/master"
 set "ICON_NAME=1080p.ico"
 set "ICON_PATH=%ASSET_DIR%\%ICON_NAME%"
-set "DATA_DIR=C:\Users\tutot\Desktop\Orbit settings\Orbit settings\Data (DO NOT TOUCH THIS)\Fortnite GameUserSettings\1080p"
-set "SETTINGS_SRC=%DATA_DIR%\GameUserSettings.ini"
 set "SETTINGS_DEST=%localappdata%\FortniteGame\Saved\Config\WindowsClient\GameUserSettings.ini"
+set "SETTINGS_LOCAL=%ASSET_DIR%\GameUserSettings_1080p.ini"
 
 if not exist "%ASSET_DIR%" mkdir "%ASSET_DIR%"
+
+:: Download icon
 if not exist "%ICON_PATH%" (
     set "LOCAL_ICONS=%SCRIPT_DIR%..\icons"
     if exist "!LOCAL_ICONS!\%ICON_NAME%" (
@@ -21,6 +22,8 @@ if not exist "%ICON_PATH%" (
         powershell -NoProfile -Command "[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; Invoke-WebRequest -Uri '%GITHUB_BASE%/icons/%ICON_NAME%' -OutFile '%ICON_PATH%' -UseBasicParsing"
     )
 )
+
+:: Download SetResolution.exe
 if not exist "%RES_EXE%" (
     set "LOCAL_EXE=%SCRIPT_DIR%..\SetResolution.exe"
     if exist "!LOCAL_EXE!" (
@@ -30,34 +33,38 @@ if not exist "%RES_EXE%" (
     )
 )
 
+:: Download GameUserSettings.ini
+if not exist "%SETTINGS_LOCAL%" (
+    echo Downloading 1080p GameUserSettings.ini...
+    powershell -NoProfile -Command "[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; Invoke-WebRequest -Uri '%GITHUB_BASE%/GameUserSettings/1080p/GameUserSettings.ini' -OutFile '%SETTINGS_LOCAL%' -UseBasicParsing"
+)
+
+:: Apply GameUserSettings
 echo Applying GameUserSettings.ini...
-if not exist "%SETTINGS_SRC%" (
-    echo [ERROR] GameUserSettings.ini not found.
+if not exist "%SETTINGS_LOCAL%" (
+    echo [ERROR] GameUserSettings.ini could not be downloaded.
     pause
     exit /b 1
 )
 if not exist "%localappdata%\FortniteGame\Saved\Config\WindowsClient\" (
-    echo [ERROR] Fortnite config folder not found.
+    echo [ERROR] Fortnite config folder not found. Launch Fortnite at least once first.
     pause
     exit /b 1
 )
 if exist "%SETTINGS_DEST%" attrib -r "%SETTINGS_DEST%" >nul 2>&1
-copy /y "%SETTINGS_SRC%" "%SETTINGS_DEST%" >nul
-if %errorlevel% equ 0 (
-    attrib +r "%SETTINGS_DEST%" >nul 2>&1
-    echo [OK] GameUserSettings.ini applied.
-) else (
-    echo [ERROR] Failed to copy GameUserSettings.ini.
-    pause
-    exit /b 1
+copy /y "%SETTINGS_LOCAL%" "%SETTINGS_DEST%" >nul
+attrib +r "%SETTINGS_DEST%" >nul 2>&1
+echo [OK] GameUserSettings.ini applied.
+
+:: Change resolution FIRST
+echo Changing resolution to 1500x1080...
+if exist "%RES_EXE%" (
+    "%RES_EXE%" 1500 1080
 )
 
+:: Launch Fortnite AFTER resolution change
 echo Launching Fortnite (High Priority)...
 start "" /high "com.epicgames.launcher://apps/Fortnite?action=launch&silent=true"
 
-echo Changing resolution to 1500x1080...
-if exist "%RES_EXE%" (
-    start "" "%RES_EXE%" 1500 1080
-)
-
+echo Fortnite 1080p launched.
 endlocal
