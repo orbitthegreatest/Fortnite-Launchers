@@ -18,7 +18,6 @@ if not exist "%ICON_PATH%" (
     if exist "!LOCAL_ICONS!\%ICON_NAME%" (
         copy "!LOCAL_ICONS!\%ICON_NAME%" "%ICON_PATH%" >nul 2>&1
     ) else (
-        echo Downloading icon...
         powershell -NoProfile -Command "[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; Invoke-WebRequest -Uri '%GITHUB_BASE%/icons/%ICON_NAME%' -OutFile '%ICON_PATH%' -UseBasicParsing"
     )
 )
@@ -27,14 +26,13 @@ if not exist "%RES_EXE%" (
     if exist "!LOCAL_EXE!" (
         copy "!LOCAL_EXE!" "%RES_EXE%" >nul 2>&1
     ) else (
-        echo Downloading SetResolution.exe...
         powershell -NoProfile -Command "[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; Invoke-WebRequest -Uri '%GITHUB_BASE%/SetResolution.exe' -OutFile '%RES_EXE%' -UseBasicParsing"
     )
 )
 
 echo Applying GameUserSettings.ini...
 if not exist "%SETTINGS_SRC%" (
-    echo [ERROR] GameUserSettings.ini not found in: %DATA_DIR%
+    echo [ERROR] GameUserSettings.ini not found.
     pause
     exit /b 1
 )
@@ -54,11 +52,12 @@ if %errorlevel% equ 0 (
     exit /b 1
 )
 
-echo Launching Fortnite 1600p (2293x1440, High Priority)...
+echo Launching Fortnite (High Priority)...
+start "" /high "com.epicgames.launcher://apps/Fortnite?action=launch&silent=true"
+
+echo Changing resolution to 2293x1440...
 if exist "%RES_EXE%" (
-    start "" "%RES_EXE%" 2293 1440 --launch
-) else (
-    echo [ERROR] SetResolution.exe not found.
-    start "" /high "com.epicgames.launcher://apps/Fortnite?action=launch&silent=true"
+    start "" "%RES_EXE%" 2293 1440
 )
+
 endlocal

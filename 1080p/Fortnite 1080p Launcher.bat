@@ -2,7 +2,6 @@
 title Fortnite 1080p Launcher
 setlocal enabledelayedexpansion
 
-set "LOG=%temp%\fortnite_1080p.log"
 set "SCRIPT_DIR=%~dp0"
 set "ASSET_DIR=%localappdata%\FortniteLaunchersAssets"
 set "RES_EXE=%ASSET_DIR%\SetResolution.exe"
@@ -13,7 +12,6 @@ set "DATA_DIR=C:\Users\tutot\Desktop\Orbit settings\Orbit settings\Data (DO NOT 
 set "SETTINGS_SRC=%DATA_DIR%\GameUserSettings.ini"
 set "SETTINGS_DEST=%localappdata%\FortniteGame\Saved\Config\WindowsClient\GameUserSettings.ini"
 
-echo === %date% %time% === > "%LOG%"
 if not exist "%ASSET_DIR%" mkdir "%ASSET_DIR%"
 if not exist "%ICON_PATH%" (
     set "LOCAL_ICONS=%SCRIPT_DIR%..\icons"
@@ -54,11 +52,12 @@ if %errorlevel% equ 0 (
     exit /b 1
 )
 
-echo Launching Fortnite 1080p...
+echo Launching Fortnite (High Priority)...
+start "" /high "com.epicgames.launcher://apps/Fortnite?action=launch&silent=true"
+
+echo Changing resolution to 1500x1080...
 if exist "%RES_EXE%" (
-    "%RES_EXE%" 1500 1080 --launch >> "%LOG%" 2>&1
-) else (
-    start "" /high "com.epicgames.launcher://apps/Fortnite?action=launch&silent=true"
+    start "" "%RES_EXE%" 1500 1080
 )
-echo Done.
+
 endlocal
