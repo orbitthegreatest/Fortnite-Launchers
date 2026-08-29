@@ -23,14 +23,12 @@ if not exist "%ICON_PATH%" (
     )
 )
 
-:: Download SetResolution.exe
-if not exist "%RES_EXE%" (
-    set "LOCAL_EXE=%SCRIPT_DIR%..\SetResolution.exe"
-    if exist "!LOCAL_EXE!" (
-        copy "!LOCAL_EXE!" "%RES_EXE%" >nul 2>&1
-    ) else (
-        powershell -NoProfile -Command "[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; Invoke-WebRequest -Uri '%GITHUB_BASE%/SetResolution.exe' -OutFile '%RES_EXE%' -UseBasicParsing"
-    )
+:: Update SetResolution.exe
+set "LOCAL_EXE=%SCRIPT_DIR%..\SetResolution.exe"
+if exist "!LOCAL_EXE!" (
+    copy /y "!LOCAL_EXE!" "%RES_EXE%" >nul 2>&1
+) else if not exist "%RES_EXE%" (
+    powershell -NoProfile -Command "[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; Invoke-WebRequest -Uri '%GITHUB_BASE%/SetResolution.exe' -OutFile '%RES_EXE%' -UseBasicParsing"
 )
 
 :: Download GameUserSettings.ini
