@@ -52,9 +52,9 @@ copy /y "%SETTINGS_LOCAL%" "%SETTINGS_DEST%" >nul
 attrib +r "%SETTINGS_DEST%" >nul 2>&1
 echo [OK] GameUserSettings.ini applied.
 
-echo Changing resolution to 2293x1440 and launching Fortnite...
+echo Changing resolution to 2293x1600 and launching Fortnite...
 if exist "%RES_EXE%" (
-    "%RES_EXE%" 2293 1440 --launch
+    "%RES_EXE%" 2293 1600 --launch
 ) else (
     echo [ERROR] SetResolution.exe not found.
     start "" /high "com.epicgames.launcher://apps/Fortnite?action=launch&silent=true"
