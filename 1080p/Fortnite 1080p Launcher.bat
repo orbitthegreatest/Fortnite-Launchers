@@ -3,7 +3,7 @@ title Fortnite 1080p Launcher
 setlocal enabledelayedexpansion
 
 :: ── CONFIG ──────────────────────────────────────────────────────────
-set "GITHUB_BASE=https://raw.githubusercontent.com/YOUR_USERNAME/YOUR_REPO/main/Custom%%20launchers/Fortnite/icons"
+set "GITHUB_BASE=https://raw.githubusercontent.com/orbitthegreatest/Fortnite-Launchers/master/icons"
 set "ICON_NAME=1080p.ico"
 set "ASSET_DIR=%localappdata%\FortniteLaunchersAssets"
 set "ICON_PATH=%ASSET_DIR%\%ICON_NAME%"
