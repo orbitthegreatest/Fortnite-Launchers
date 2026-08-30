@@ -40,7 +40,7 @@ foreach ($l in $launchers) {
         continue
     }
 
-    $lnkPath = Join-Path $dir "$($l.Name).lnk"
+    $lnkPath = Join-Path $batDir "$($l.Name).lnk"
     $lnk = $sh.CreateShortcut($lnkPath)
     $lnk.TargetPath = "cmd.exe"
     $lnk.Arguments = "/c `"$batPath`""
