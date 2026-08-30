@@ -9,7 +9,8 @@ $launchers = @(
 )
 
 $batDir = Join-Path $dir "..\Custom launchers\Fortnite"
-$repoIcons = Join-Path $dir "..\Fortnite-Launchers\icons"
+$desktop = [Environment]::GetFolderPath("Desktop")
+$repoIcons = Join-Path $desktop "Personal things\Github stuff\Fortnite-Launchers\icons"
 
 foreach ($l in $launchers) {
     $batPath = Join-Path $batDir $l.Bat
