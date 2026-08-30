@@ -8,13 +8,15 @@ $launchers = @(
     @{ Name = "Fortnite 1600p"; Bat = "Fortnite 1600p Launcher.bat"; Icon = "1600p.ico" }
 )
 
+$batDir = Join-Path $dir "..\Custom launchers\Fortnite"
+$repoIcons = Join-Path $dir "..\Fortnite-Launchers\icons"
+
 foreach ($l in $launchers) {
-    $batPath = Join-Path $dir $l.Bat
+    $batPath = Join-Path $batDir $l.Bat
     $icoPath = ""
 
-    # Find .ico: local icons/ -> Fortnite-Launchers/icons/ -> download
-    $local = Join-Path $dir "icons\$($l.Icon)"
-    $repo = Join-Path $dir "..\Fortnite-Launchers\icons\$($l.Icon)"
+    $local = Join-Path $batDir "icons\$($l.Icon)"
+    $repo = Join-Path $repoIcons $l.Icon
     $asset = "$env:localappdata\FortniteLaunchersAssets\$($l.Icon)"
 
     if (Test-Path $local) { $icoPath = $local }
@@ -42,7 +44,7 @@ foreach ($l in $launchers) {
     $lnk = $sh.CreateShortcut($lnkPath)
     $lnk.TargetPath = "cmd.exe"
     $lnk.Arguments = "/c `"$batPath`""
-    $lnk.WorkingDirectory = $dir
+    $lnk.WorkingDirectory = $batDir
     if ($icoPath -and (Test-Path $icoPath)) {
         $lnk.IconLocation = "$icoPath,0"
     }
