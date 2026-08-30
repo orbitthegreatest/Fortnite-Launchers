@@ -1,47 +1,41 @@
 @echo off
-title Fortnite 1080p Launcher
+title Fortnite 1440p Launcher
 setlocal enabledelayedexpansion
 
 set "MY_DIR=%~dp0"
 set "ASSET_DIR=%localappdata%\FortniteLaunchersAssets"
 set "RES_EXE=%ASSET_DIR%\SetResolution.exe"
 set "GITHUB_BASE=https://raw.githubusercontent.com/orbitthegreatest/Fortnite-Launchers/master"
-set "ICON_PATH=%ASSET_DIR%\1080p.ico"
+set "ICON_PATH=%ASSET_DIR%\1440p.ico"
 set "SETTINGS_DEST=%localappdata%\FortniteGame\Saved\Config\WindowsClient\GameUserSettings.ini"
-set "SETTINGS_LOCAL=%ASSET_DIR%\GameUserSettings_1080p.ini"
+set "SETTINGS_LOCAL=%ASSET_DIR%\GameUserSettings_1440p.ini"
+set "REPO_DIR=%MY_DIR%.."
 
 if not exist "%ASSET_DIR%" mkdir "%ASSET_DIR%"
 
-:: Get repo root (parent of this bat's folder)
-for %%I in ("%MY_DIR%..") do set "REPO_DIR=%%~fI"
-
-:: Download icon
 if not exist "%ICON_PATH%" (
-    if exist "%REPO_DIR%\icons\1080p.ico" (
-        copy "%REPO_DIR%\icons\1080p.ico" "%ICON_PATH%" >nul 2>&1
+    if exist "%REPO_DIR%\icons\1440p.ico" (
+        copy "%REPO_DIR%\icons\1440p.ico" "%ICON_PATH%" >nul 2>&1
     ) else (
-        powershell -NoProfile -Command "[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; Invoke-WebRequest -Uri '%GITHUB_BASE%/icons/1080p.ico' -OutFile '%ICON_PATH%' -UseBasicParsing"
+        powershell -NoProfile -Command "[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; Invoke-WebRequest -Uri '%GITHUB_BASE%/icons/1440p.ico' -OutFile '%ICON_PATH%' -UseBasicParsing"
     )
 )
 
-:: Download/SetResolution.exe
 if exist "%REPO_DIR%\SetResolution.exe" (
     copy /y "%REPO_DIR%\SetResolution.exe" "%RES_EXE%" >nul 2>&1
 ) else if not exist "%RES_EXE%" (
     powershell -NoProfile -Command "[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; Invoke-WebRequest -Uri '%GITHUB_BASE%/SetResolution.exe' -OutFile '%RES_EXE%' -UseBasicParsing"
 )
 
-:: Download GameUserSettings.ini
 if not exist "%SETTINGS_LOCAL%" (
-    if exist "%REPO_DIR%\GameUserSettings\1080p\GameUserSettings.ini" (
-        copy "%REPO_DIR%\GameUserSettings\1080p\GameUserSettings.ini" "%SETTINGS_LOCAL%" >nul 2>&1
+    if exist "%REPO_DIR%\GameUserSettings\1440p\GameUserSettings.ini" (
+        copy "%REPO_DIR%\GameUserSettings\1440p\GameUserSettings.ini" "%SETTINGS_LOCAL%" >nul 2>&1
     ) else (
-        echo Downloading 1080p GameUserSettings.ini...
-        powershell -NoProfile -Command "[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; Invoke-WebRequest -Uri '%GITHUB_BASE%/GameUserSettings/1080p/GameUserSettings.ini' -OutFile '%SETTINGS_LOCAL%' -UseBasicParsing"
+        echo Downloading 1440p GameUserSettings.ini...
+        powershell -NoProfile -Command "[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; Invoke-WebRequest -Uri '%GITHUB_BASE%/GameUserSettings/1440p/GameUserSettings.ini' -OutFile '%SETTINGS_LOCAL%' -UseBasicParsing"
     )
 )
 
-:: Apply GameUserSettings
 echo Applying GameUserSettings.ini...
 if not exist "%SETTINGS_LOCAL%" (
     echo [ERROR] GameUserSettings.ini could not be downloaded.
@@ -58,14 +52,13 @@ copy /y "%SETTINGS_LOCAL%" "%SETTINGS_DEST%" >nul
 attrib +r "%SETTINGS_DEST%" >nul 2>&1
 echo [OK] GameUserSettings.ini applied.
 
-:: Change resolution and launch
-echo Changing resolution to 1500x1080 and launching Fortnite...
+echo Changing resolution to 2000x1440 and launching Fortnite...
 if exist "%RES_EXE%" (
-    "%RES_EXE%" 1500 1080 --launch
+    "%RES_EXE%" 2000 1440 --launch
 ) else (
     echo [ERROR] SetResolution.exe not found.
     start "" /high "com.epicgames.launcher://apps/Fortnite?action=launch&silent=true"
 )
 
-echo Fortnite 1080p session ended.
+echo Fortnite 1440p session ended.
 endlocal

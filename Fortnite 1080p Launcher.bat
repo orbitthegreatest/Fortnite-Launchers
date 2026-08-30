@@ -9,13 +9,10 @@ set "GITHUB_BASE=https://raw.githubusercontent.com/orbitthegreatest/Fortnite-Lau
 set "ICON_PATH=%ASSET_DIR%\1080p.ico"
 set "SETTINGS_DEST=%localappdata%\FortniteGame\Saved\Config\WindowsClient\GameUserSettings.ini"
 set "SETTINGS_LOCAL=%ASSET_DIR%\GameUserSettings_1080p.ini"
+set "REPO_DIR=%MY_DIR%.."
 
 if not exist "%ASSET_DIR%" mkdir "%ASSET_DIR%"
 
-:: Get repo root (parent of this bat's folder)
-for %%I in ("%MY_DIR%..") do set "REPO_DIR=%%~fI"
-
-:: Download icon
 if not exist "%ICON_PATH%" (
     if exist "%REPO_DIR%\icons\1080p.ico" (
         copy "%REPO_DIR%\icons\1080p.ico" "%ICON_PATH%" >nul 2>&1
@@ -24,14 +21,12 @@ if not exist "%ICON_PATH%" (
     )
 )
 
-:: Download/SetResolution.exe
 if exist "%REPO_DIR%\SetResolution.exe" (
     copy /y "%REPO_DIR%\SetResolution.exe" "%RES_EXE%" >nul 2>&1
 ) else if not exist "%RES_EXE%" (
     powershell -NoProfile -Command "[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; Invoke-WebRequest -Uri '%GITHUB_BASE%/SetResolution.exe' -OutFile '%RES_EXE%' -UseBasicParsing"
 )
 
-:: Download GameUserSettings.ini
 if not exist "%SETTINGS_LOCAL%" (
     if exist "%REPO_DIR%\GameUserSettings\1080p\GameUserSettings.ini" (
         copy "%REPO_DIR%\GameUserSettings\1080p\GameUserSettings.ini" "%SETTINGS_LOCAL%" >nul 2>&1
@@ -41,7 +36,6 @@ if not exist "%SETTINGS_LOCAL%" (
     )
 )
 
-:: Apply GameUserSettings
 echo Applying GameUserSettings.ini...
 if not exist "%SETTINGS_LOCAL%" (
     echo [ERROR] GameUserSettings.ini could not be downloaded.
@@ -58,7 +52,6 @@ copy /y "%SETTINGS_LOCAL%" "%SETTINGS_DEST%" >nul
 attrib +r "%SETTINGS_DEST%" >nul 2>&1
 echo [OK] GameUserSettings.ini applied.
 
-:: Change resolution and launch
 echo Changing resolution to 1500x1080 and launching Fortnite...
 if exist "%RES_EXE%" (
     "%RES_EXE%" 1500 1080 --launch

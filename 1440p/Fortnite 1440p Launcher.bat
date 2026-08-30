@@ -3,7 +3,6 @@ title Fortnite 1440p Launcher
 setlocal enabledelayedexpansion
 
 set "MY_DIR=%~dp0"
-set "REPO_DIR=%MY_DIR%..\..\..\..\..\Custom launchers\Fortnite-Launchers"
 set "ASSET_DIR=%localappdata%\FortniteLaunchersAssets"
 set "RES_EXE=%ASSET_DIR%\SetResolution.exe"
 set "GITHUB_BASE=https://raw.githubusercontent.com/orbitthegreatest/Fortnite-Launchers/master"
@@ -12,6 +11,8 @@ set "SETTINGS_DEST=%localappdata%\FortniteGame\Saved\Config\WindowsClient\GameUs
 set "SETTINGS_LOCAL=%ASSET_DIR%\GameUserSettings_1440p.ini"
 
 if not exist "%ASSET_DIR%" mkdir "%ASSET_DIR%"
+
+for %%I in ("%MY_DIR%..") do set "REPO_DIR=%%~fI"
 
 if not exist "%ICON_PATH%" (
     if exist "%REPO_DIR%\icons\1440p.ico" (
